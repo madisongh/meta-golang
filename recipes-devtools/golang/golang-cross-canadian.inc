@@ -1,0 +1,60 @@
+inherit cross-canadian
+
+DEPENDS += "golang-native virtual/${HOST_PREFIX}gcc-crosssdk"
+PN = "golang-cross-canadian-${TRANSLATED_TARGET_ARCH}"
+
+export GOHOSTOS = "${BUILD_GOOS}"
+export GOHOSTARCH = "${BUILD_GOARCH}"
+export GOOS = "${HOST_GOOS}"
+export GOARCH = "${HOST_GOARCH}"
+export GOARM = "${HOST_GOARM}"
+export GOROOT_BOOTSTRAP = "${STAGING_LIBDIR_NATIVE}/go"
+export GOROOT_FINAL = "${libdir}/go"
+export CGO_ENABLED = "1"
+export CC_FOR_TARGET="${HOST_CC}"
+export CXX_FOR_TARGET="${HOST_CXX}"
+CC = "${@d.getVar('BUILD_CC', True).strip()}"
+
+do_configure() {
+    :
+}
+
+do_compile() {
+    export GOBIN="${B}/bin"
+    rm -rf ${GOBIN} ${B}/pkg
+    mkdir ${GOBIN}
+    cd src
+    ./make.bash
+}
+
+
+make_wrapper() {
+    rm -f ${D}${bindir}/$2
+    cat <<END >${D}${bindir}/$2
+#!/bin/bash
+here=\`dirname \$0\`
+export GOARCH="${TARGET_GOARCH}"
+export GOOS="${TARGET_GOOS}"
+export GOARM="${TARGET_GOARM}"
+\$here/../../lib/${TARGET_SYS}/go/bin/$1 "\$@"
+END
+    chmod +x ${D}${bindir}/$2
+}
+
+do_install() {
+    install -d ${D}${libdir}/go
+    cp -a ${B}/pkg ${D}${libdir}/go/
+    install -d ${D}${libdir}/go/src
+    (cd ${S}/src; for d in *; do \
+        [ -d $d ] && cp -a ${S}/src/$d ${D}${libdir}/go/src/; \
+    done)
+    install -d ${D}${bindir} ${D}${libdir}/go/bin
+    for f in ${B}/bin/*
+    do
+        base=`basename $f`
+        install -m755 $f ${D}${libdir}/go/bin
+        make_wrapper $base ${TARGET_PREFIX}$base
+    done
+}
+
+INSANE_SKIP_${PN} = "staticdev"

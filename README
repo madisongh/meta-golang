@@ -1,0 +1,35 @@
+OpenEmbedded/Yocto layer for Go language support
+================================================
+
+A repository for Go language recipes, including:
+
+ * The Go toolchain and runtime from the Go Project (http://golang.org)
+     - adapted to build native, cross, crosssdk, cross-canadian, nativesdk
+ * Recipes for packages written in Go
+ * A bbclass for simplifying the creation of recipes for Go packages
+     - automatically generates ptest packages using go test framework
+
+Package dependencies are specified in recipes.  By default,
+packages use AUTOREV floating revisions, but you can lock down
+specific versions using SRCREV overrides for packages you include
+in your build.
+
+Recipe naming convention:
+
+ * All recipes begin with `golang-'
+ * Package recipes are named based on the import path, typically
+   omitting the hosting site's domain name but including the
+   rest of the path with hyphens in place of slashes.  Packages
+   using meta-tag references (such as those using gopkg.in) do
+   include the domain name.
+
+This layer depends on:
+URI: git://git.openembedded.org/openembedded-core
+branches: fido, jethro, master
+
+
+Contributing
+------------
+
+Please submit issues and pull requests via GitHub.
+
