@@ -61,10 +61,10 @@ golang_do_configure() {
     cd ${S_GOROOT}
     rm -f ${B}/.go_compile.list ${B}/.go_compile_ptest.list
     export CGO_ENABLED=1
-    GOPATH=${S_GOROOT} ${GO} list -f '{{if not .Goroot}}{{.ImportPath}} {{.CgoFiles}}{{end}}' ${GO_PACKAGES} >${B}/.go_compile.list
+    GOPATH=${S_GOROOT} ${GO} list -f '{{if not .Goroot}}{{.ImportPath}} {{.CgoFiles}}{{end}}' ${GO_PACKAGES} | grep -v '${GO_SRCROOT}/vendor/' >${B}/.go_compile.list
 
-    GOPATH=${S_GOROOT} ${GO} list -f '{{if not .Goroot}}{{.ImportPath}} {{.Dir}} {{.Root}} {{.CgoFiles}}{{end}}' ${GO_PACKAGES} >${B}/.go_compile_ptest.list
-    GOPATH=${S_GOROOT} ${GO} list -f '{{if not .Goroot}}{{.ImportPath}} {{.Root}} {{.Incomplete}} {{end}}' ${GO_PACKAGES} | while read pkg root inc; do
+    GOPATH=${S_GOROOT} ${GO} list -f '{{if not .Goroot}}{{.ImportPath}} {{.Dir}} {{.Root}} {{.CgoFiles}}{{end}}' ${GO_PACKAGES} | grep -v '${GO_SRCROOT}/vendor/' >${B}/.go_compile_ptest.list
+    GOPATH=${S_GOROOT} ${GO} list -f '{{if not .Goroot}}{{.ImportPath}} {{.Root}} {{.Incomplete}} {{end}}' ${GO_PACKAGES} | grep -v '${GO_SRCROOT}/vendor/' | while read pkg root inc; do
         if [ "$root" != "${S_GOROOT}" ]; then
             bberror "${PN}: package $pkg root is outside source directory"
         fi
