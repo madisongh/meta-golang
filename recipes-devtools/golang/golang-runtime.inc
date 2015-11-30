@@ -30,7 +30,7 @@ do_compile() {
 
 do_install() {
     install -d ${D}${libdir}/go/src
-    cp -a ${B}/pkg ${D}${libdir}/go/
+    cp --preserve=mode,timestamps -R ${B}/pkg ${D}${libdir}/go/
     if [ "${BUILD_GOTUPLE}" != "${TARGET_GOTUPLE}" ]; then
         rm -rf ${D}${libdir}/go/pkg/${BUILD_GOTUPLE}
         rm -rf ${D}${libdir}/go/pkg/obj/${BUILD_GOTUPLE}
@@ -38,7 +38,7 @@ do_install() {
     rm -rf ${D}${libdir}/go/pkg/tool
     rm -rf ${D}${libdir}/go/pkg/bootstrap    
     find src -mindepth 1 -maxdepth 1 -type d | while read srcdir; do
-	cp -av $srcdir ${D}${libdir}/go/src/
+	cp --preserve=mode,timestamps -R $srcdir ${D}${libdir}/go/src/
     done
 }
 
