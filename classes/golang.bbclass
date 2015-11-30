@@ -59,7 +59,7 @@ do_configure[dirs] = "${B}"
 do_configure[cleandirs] = "${B}"
 golang_do_configure() {
     mkdir -p ${B}/src/${GO_SRC_PARENT}
-    ln -sn ${S}/${GO_SRCROOT} ${B}/src/${GO_SRC_PARENT}/
+    ln -snf ${S}/${GO_SRCROOT} ${B}/src/${GO_SRC_PARENT}/
     cd ${S_GOROOT}
     rm -f ${B}/.go_compile.list ${B}/.go_compile_ptest.list
     export CGO_ENABLED=1
