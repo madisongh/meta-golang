@@ -28,6 +28,8 @@ export GOTOOLDIR = "${STAGING_LIBDIR_NATIVE}/${TARGET_SYS}/go/pkg/tool/${BUILD_G
 
 GO_PACKAGES ?= "all"
 
+export CGO_ENABLED ?= "0"
+
 do_unpack[dirs] = "${S_GOROOT}/src"
 python golang_do_unpack() {
     src_uri = (d.getVar('SRC_URI', True) or "").split()
@@ -79,7 +81,6 @@ do_compile[cleandirs] = "${B}/bin"
 
 golang_do_compile() {
     while read pkg cgofiles; do
-        export CGO_ENABLED=0
         [ "$cgofiles" != "[]" ] && CGO_ENABLED=1
         ${GO} install ${GOBUILDFLAGS} $pkg
     done < ${B}/.go_compile.list
@@ -107,7 +108,6 @@ do_compile_ptest() {
     rm -f ${B}/.go_compiled_tests.list
     while read pkg pkgdir pkgroot cgofiles; do
         cd $pkgdir
-        export CGO_ENABLED=0
         [ "$cgofiles" != "[]" ] && CGO_ENABLED=1
         ${GO} test ${GOPTESTBUILDFLAGS} $pkg
         relpath=`echo $pkgdir | cut -b ${@len(d.getVar('S_GOROOT', True) + "/src")+2}-`
