@@ -150,6 +150,7 @@ PACKAGES = "${@bb.utils.contains('PTEST_ENABLED', '1', '${PN}-ptest', '', d)} ${
 FILES_${PN} = "${bindir}/* ${sysconfdir} ${sharedstatedir} \
                ${localstatedir} ${datadir}/${BPN}"
 INSANE_SKIP_${PN} = "already-stripped ldflags"
+INSANE_SKIP_${PN}-ptest = "already-stripped ldflags"
 FILES_${PN}-dev = "${libdir}"
 INSANE_SKIP_${PN}-dev = "staticdev"
 INHIBIT_PACKAGE_STRIP = "1"
