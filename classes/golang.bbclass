@@ -19,6 +19,7 @@ S_GOROOT = "${WORKDIR}/go"
 S = "${S_GOROOT}/src"
 GO_SRC_PARENT = "${@os.path.dirname(d.getVar('GO_SRCROOT', True))}"
 B = "${WORKDIR}/build"
+GO_TMPDIR = "${WORKDIR}/go-tmp"
 
 GOROOT = "${STAGING_LIBDIR}/go"
 GOROOT_class-native = "${STAGING_LIBDIR_NATIVE}/go"
@@ -76,10 +77,11 @@ golang_do_configure() {
     done
 }
 
-do_compile[dirs] =+ "${B}/bin"
-do_compile[cleandirs] = "${B}/bin"
+do_compile[dirs] =+ "${B}/bin ${GO_TMPDIR}"
+do_compile[cleandirs] = "${B}/bin ${GO_TMPDIR}"
 
 golang_do_compile() {
+    export TMPDIR="${GO_TMPDIR}"
     while read pkg cgofiles; do
         [ "$cgofiles" != "[]" ] && CGO_ENABLED=1
         ${GO} install ${GOBUILDFLAGS} $pkg
