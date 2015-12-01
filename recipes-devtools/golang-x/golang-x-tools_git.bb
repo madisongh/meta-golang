@@ -81,5 +81,6 @@ GO_PACKAGES = " \
 inherit golang
 
 DEPENDS += "golang-x-net"
+RDEPENDS_${PN}-dev = "bash"
 
 BBCLASSEXTEND = "native"
