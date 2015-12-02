@@ -1,6 +1,6 @@
 inherit cross-canadian
 
-DEPENDS += "golang-native virtual/${HOST_PREFIX}gcc-crosssdk"
+DEPENDS += "golang-native virtual/${HOST_PREFIX}gcc-crosssdk virtual/nativesdk-${HOST_PREFIX}libc-for-gcc"
 PN = "golang-cross-canadian-${TRANSLATED_TARGET_ARCH}"
 
 export GOHOSTOS = "${BUILD_GOOS}"
