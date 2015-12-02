@@ -153,6 +153,7 @@ FILES_${PN} = "${bindir}/* ${sysconfdir} ${sharedstatedir} \
                ${localstatedir} ${datadir}/${BPN}"
 INSANE_SKIP_${PN} = "already-stripped ldflags"
 INSANE_SKIP_${PN}-ptest = "already-stripped ldflags"
+ALLOW_EMPTY_${PN} = "1"
 FILES_${PN}-dev = "${libdir}"
 INSANE_SKIP_${PN}-dev = "staticdev"
 INHIBIT_PACKAGE_STRIP = "1"
