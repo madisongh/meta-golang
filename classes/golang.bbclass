@@ -122,8 +122,12 @@ do_install_ptest_base() {
     tests=""
     while read test; do
         tests="$tests${tests:+ }${test%.test}"
-        install -d ${D}${PTEST_PATH}/`dirname $test`
+        testdir=`dirname $test`
+        install -d ${D}${PTEST_PATH}/$testdir
         install -m 0755 ${B}/src/$test ${D}${PTEST_PATH}/$test
+        if [ -d "${S}/$testdir/testdata" ]; then
+            cp --preserve=mode,timestamps -R "${S}/$testdir/testdata" ${D}${PTEST_PATH}/$testdir
+        fi
     done < ${B}/.go_compiled_tests.list
     if [ -n "$tests" ]; then
         install -d ${D}${PTEST_PATH}
@@ -131,7 +135,8 @@ do_install_ptest_base() {
 #!/bin/sh
 ANYFAILED=0
 for t in $tests; do
-    if ( "${PTEST_PATH}/\$t.test" ${GOPTESTFLAGS} | tee /dev/fd/9 | grep -q "^FAIL" ) 9>&1; then
+    testdir=\`dirname \$t.test\`
+    if ( cd "${PTEST_PATH}/\$testdir"; "${PTEST_PATH}/\$t.test" ${GOPTESTFLAGS} | tee /dev/fd/9 | grep -q "^FAIL" ) 9>&1; then
         ANYFAILED=1
     fi
 done
