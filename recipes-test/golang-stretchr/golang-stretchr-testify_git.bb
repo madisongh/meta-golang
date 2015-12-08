@@ -1,7 +1,7 @@
 SUMMARY = "Extensions to the standard go testing package"
 HOMEPAGE = "http://godoc.org/github.com/stretchr/testify"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${GO_SRCROOT}/LICENCE.txt;md5=fb69a5b3ab53064d3b92a28289f5a59e"
+LIC_FILES_CHKSUM = "file://${GO_SRCROOT}/LICENCE.txt;md5=39cd1d751bc25944831de86496e3cf68"
 GO_SRCROOT = "github.com/stretchr/testify"
 SRC_URI = "git://${GO_SRCROOT};name=testify \
            git://github.com/stretchr/objx;name=objx;destsuffix=${GO_SRCROOT}/vendor/github.com/stretchr/objx"
