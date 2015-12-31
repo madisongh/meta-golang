@@ -38,6 +38,6 @@ def golang_map_os(o, d):
     return o
 
 def golang_arch_supports_shlibs(goarch, d):
-    if goarch in ['386', 'amd64', 'arm', 'arm64']:
+    if goarch in d.getVar('GO_SHLIB_ARCHS', True).split():
         return '1'
     return '0'
