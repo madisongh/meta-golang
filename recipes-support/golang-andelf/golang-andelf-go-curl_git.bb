@@ -9,7 +9,8 @@ PV="1.0+git${SRCPV}"
 
 DEPENDS = "curl"
 
-# Exclude .../examples, they aren't buildable
-GO_PACKAGES = "${GO_SRCROOT}"
+do_configure_prepend() {
+    rm -rf ${S}/${GO_SRCROOT}/examples
+}
 
 inherit golang pkgconfig
