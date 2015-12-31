@@ -9,6 +9,8 @@ PV="1.0+git${SRCPV}"
 
 DEPENDS = "curl"
 
+CGO_ENABLED = "1"
+
 do_configure_prepend() {
     rm -rf ${S}/${GO_SRCROOT}/examples
 }
