@@ -7,8 +7,9 @@ SRC_URI = "git://${GO_SRCROOT}"
 SRCREV = "${AUTOREV}"
 PV="1.0+git${SRCPV}"
 
-# Don't build the examples
-GO_PACKAGES = "github.com/ttacon/chalk"
+do_configure_prepend() {
+    rm -rf ${S}${GO_SRCROOT}/examples
+}
 
 inherit golang
 
