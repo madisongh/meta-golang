@@ -9,10 +9,8 @@ PV="1.0+git${SRCPV}"
 
 DEPENDS = "golang-x-net golang-pborman-uuid"
 
-# Don't build the samples
-GO_PACKAGES = " \
-    ${GO_SRCROOT} \
-    ${GO_SRCROOT}/packets \
-"
+do_configure_prepend() {
+    rm -rf ${S}/${GO_SRCROOT}/samples
+}
 
 inherit golang
