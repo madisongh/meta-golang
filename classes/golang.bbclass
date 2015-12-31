@@ -8,12 +8,14 @@ DEPENDS_append = " ${DEPENDS_GOLANG}"
 
 export GO = "${HOST_PREFIX}go"
 export GOPATH = "${B}"
+GO_LINKSHARED ?= "${@['', '-linkshared'][d.getVar('GO_SHLIBS_SUPPORTED', True) == '1']}"
 export GOBUILDFLAGS ?= "-x -v"
 export GOPTESTBUILDFLAGS ?= "${GOBUILDFLAGS} -c"
 export GOPTESTFLAGS ?= "-test.v"
 
 GO_BUILDBIN = "${B}/${GO_BUILD_BINDIR}"
 GO_BUILDBIN_class-native = "${B}/bin"
+
 
 S_GOROOT = "${WORKDIR}/go"
 S = "${S_GOROOT}/src"
@@ -25,11 +27,11 @@ GOROOT = "${STAGING_LIBDIR}/go"
 GOROOT_class-native = "${STAGING_LIBDIR_NATIVE}/go"
 GOROOT_class-nativesdk = "${STAGING_DIR_TARGET}${libdir}/go"
 export GOROOT
-export GOTOOLDIR = "${STAGING_LIBDIR_NATIVE}/${TARGET_SYS}/go/pkg/tool/${BUILD_GOTUPLE}"
+GOTOOLDIR = "${STAGING_LIBDIR_NATIVE}/${TARGET_SYS}/go/pkg/tool/${BUILD_GOTUPLE}"
+GOTOOLDIR_class-native = "${STAGING_LIBDIR_NATIVE}/go/pkg/tool/${BUILD_GOTUPLE}"
+export GOTOOLDIR
 
-GO_PACKAGES ?= "all"
-
-export CGO_ENABLED ?= "0"
+export CGO_ENABLED ?= "${@['0', '1'][d.getVar('GO_SHLIBS_SUPPORTED', True) == '1']}"
 
 do_unpack[dirs] = "${S_GOROOT}/src"
 python golang_do_unpack() {
@@ -59,18 +61,10 @@ python golang_do_unpack() {
 do_configure[dirs] = "${B}"
 do_configure[cleandirs] = "${B}"
 golang_do_configure() {
-    mkdir -p ${B}/src/${GO_SRC_PARENT}
-    ln -snf ${S}/${GO_SRCROOT} ${B}/src/${GO_SRC_PARENT}/
-    cd ${S_GOROOT}
-    rm -f ${B}/.go_compile.list ${B}/.go_compile_ptest.list
-    export CGO_ENABLED=1
-    GOPATH=${S_GOROOT} ${GO} list -f '{{if not .Goroot}}{{.ImportPath}} {{.CgoFiles}}{{end}}' ${GO_PACKAGES} | grep -v '${GO_SRCROOT}/vendor/' >${B}/.go_compile.list
-
-    GOPATH=${S_GOROOT} ${GO} list -f '{{if not .Goroot}}{{.ImportPath}} {{.Dir}} {{.Root}} {{.CgoFiles}}{{end}}' ${GO_PACKAGES} | grep -v '${GO_SRCROOT}/vendor/' >${B}/.go_compile_ptest.list
-    GOPATH=${S_GOROOT} ${GO} list -f '{{if not .Goroot}}{{.ImportPath}} {{.Root}} {{.Incomplete}} {{end}}' ${GO_PACKAGES} | grep -v '${GO_SRCROOT}/vendor/' | while read pkg root inc; do
-        if [ "$root" != "${S_GOROOT}" ]; then
-            bberror "${PN}: package $pkg root is outside source directory"
-        fi
+    ln -snf ${S} ${B}/
+    rm -f ${B}/.go_compile_ptest.list
+    ${GO} list -f '{{.ImportPath}} {{.TestGoFiles}}' ${GO_SRCROOT}/... | grep -v '\[\]$' | awk '{print $1}' >${B}/.go_compile_ptest.list
+    ${GO} list -f '{{.ImportPath}} {{.Incomplete}}' ${GO_SRCROOT}/... | while read pkg inc; do
         if $inc; then
             bberror "${PN}: package $pkg is missing dependencies"
         fi
@@ -82,19 +76,29 @@ do_compile[cleandirs] = "${B}/bin ${GO_TMPDIR}"
 
 golang_do_compile() {
     export TMPDIR="${GO_TMPDIR}"
-    while read pkg cgofiles; do
-        [ "$cgofiles" != "[]" ] && CGO_ENABLED=1
-        ${GO} install ${GOBUILDFLAGS} $pkg
-    done < ${B}/.go_compile.list
+    if [ "${GO_SHLIBS_SUPPORTED}" = "1" ]; then
+        ${GO} install -buildmode=shared ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/...
+        ${GO} install -buildmode=exe ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/...
+    else
+        ${GO} install ${GOBUILDFLAGS} ${GO_SRCROOT}/...
+    fi
 }
 
 golang_do_install() {
+    for f in ${B}/pkg/${TARGET_GOTUPLE}_dynlink/*${SOLIBSDEV}; do
+        if [ -e "$f" ]; then
+            chrpath -r "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink" $f
+        fi
+    done
     didbindir=""
     install -d ${D}${libdir}/go/src/${@os.path.dirname(d.getVar('GO_SRCROOT', True))}
     cp --preserve=mode,timestamps -R ${S} ${D}${libdir}/go/
     find ${D}${libdir}/go/src/${GO_SRCROOT} -type f -name '*.test' -exec rm {} \;
     for tgtfile in ${GO_BUILDBIN}/*; do
-        [ ! -e $tgtfile ] && continue
+        [ -e $tgtfile ] || continue
+	if [ "${GO_SHLIBS_SUPPORTED}" = "1" ]; then
+            chrpath -r "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink" $tgtfile
+        fi
         if [ -z "$didbindir" ]; then                
             install -d ${D}${bindir}
             didbindir="yes"
@@ -108,12 +112,10 @@ golang_do_install() {
 do_compile_ptest() {
     curwpd=$PWD
     rm -f ${B}/.go_compiled_tests.list
-    while read pkg pkgdir pkgroot cgofiles; do
-        cd $pkgdir
-        [ "$cgofiles" != "[]" ] && CGO_ENABLED=1
+    while read pkg; do
+        cd ${S}/$pkg
         ${GO} test ${GOPTESTBUILDFLAGS} $pkg
-        relpath=`echo $pkgdir | cut -b ${@len(d.getVar('S_GOROOT', True) + "/src")+2}-`
-        find . -mindepth 1 -maxdepth 1 -type f -name '*.test' -exec echo $relpath/{} \; | sed -e's,/\./,/,' >>${B}/.go_compiled_tests.list
+        find . -mindepth 1 -maxdepth 1 -type f -name '*.test' -exec echo $pkg/{} \; | sed -e's,/\./,/,' >>${B}/.go_compiled_tests.list
     done < ${B}/.go_compile_ptest.list
     cd $curpwd
 }
@@ -155,9 +157,10 @@ EOF
 
 PACKAGES = "${@bb.utils.contains('PTEST_ENABLED', '1', '${PN}-ptest', '', d)} ${PN} ${PN}-dev"
 FILES_${PN} = "${bindir}/* ${sysconfdir} ${sharedstatedir} \
-               ${localstatedir} ${datadir}/${BPN}"
-INSANE_SKIP_${PN} = "already-stripped ldflags"
-INSANE_SKIP_${PN}-ptest = "already-stripped ldflags"
+               ${localstatedir} ${datadir}/${BPN} \
+	       ${libdir}/go/pkg/*_dynlink/*${SOLIBSDEV}"
+INSANE_SKIP_${PN} = "already-stripped ldflags dev-so textrel"
+INSANE_SKIP_${PN}-ptest = "already-stripped ldflags textrel"
 ALLOW_EMPTY_${PN} = "1"
 FILES_${PN}-dev = "${libdir}"
 INSANE_SKIP_${PN}-dev = "staticdev"

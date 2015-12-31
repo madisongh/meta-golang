@@ -10,6 +10,8 @@ TARGET_GOARCH = "${@golang_map_arch(d.getVar('TARGET_ARCH', True), d)}"
 TARGET_GOARM = "${@golang_map_arm(d.getVar('TARGET_ARCH', True), d.getVar('TUNE_FEATURES', True), d)}"
 TARGET_GOTUPLE = "${TARGET_GOOS}_${TARGET_GOARCH}"
 GO_BUILD_BINDIR = "${@['bin/${HOST_GOTUPLE}','bin'][d.getVar('BUILD_GOTUPLE',True) == d.getVar('HOST_GOTUPLE',True)]}"
+GO_SHLIBS_SUPPORTED ?= "${@golang_arch_supports_shlibs(d.getVar('TARGET_GOARCH', True), d)}"
+GO_SHLIBS_SUPPORTED_class-native = "0"
 
 def golang_map_arch(a, d):
     import re
@@ -34,3 +36,8 @@ def golang_map_os(o, d):
     if o.startswith('linux'):
         return 'linux'
     return o
+
+def golang_arch_supports_shlibs(goarch, d):
+    if goarch in ['386', 'amd64', 'arm', 'arm64']:
+        return '1'
+    return '0'
