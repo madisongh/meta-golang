@@ -1,0 +1,19 @@
+Index: git/src/cmd/link/internal/ld/lib.go
+===================================================================
+--- git.orig/src/cmd/link/internal/ld/lib.go
++++ git/src/cmd/link/internal/ld/lib.go
+@@ -1078,12 +1078,14 @@ func hostlink() {
+ 			// Pass -z nodelete to mark the shared library as
+ 			// non-closeable: a dlclose will do nothing.
+ 			argv = append(argv, "-shared", "-Wl,-z,nodelete")
++			argv = append(argv, fmt.Sprintf("-Wl,-soname,%s", filepath.Base(outfile)))
+ 		}
+ 	case BuildmodeShared:
+ 		if UseRelro() {
+ 			argv = append(argv, "-Wl,-z,relro")
+ 		}
+ 		argv = append(argv, "-shared")
++		argv = append(argv, fmt.Sprintf("-Wl,-soname,%s", filepath.Base(outfile)))
+ 	}
+ 
+ 	if Iself && DynlinkingGo() {

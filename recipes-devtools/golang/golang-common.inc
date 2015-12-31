@@ -18,7 +18,7 @@ LICENSE = "BSD"
 
 inherit golang-osarchmap
 
-SRC_URI = "http://golang.org/dl/go${PV}.src.tar.gz"
+SRC_URI = "http://golang.org/dl/go${PV}.src.tar.gz;name=main"
 S = "${WORKDIR}/go"
 B = "${S}"
 

@@ -1,6 +1,6 @@
 inherit cross-canadian
 
-DEPENDS += "golang-native virtual/${HOST_PREFIX}gcc-crosssdk virtual/nativesdk-${HOST_PREFIX}libc-for-gcc"
+DEPENDS += "golang-native virtual/${HOST_PREFIX}gcc-crosssdk virtual/nativesdk-${HOST_PREFIX}libc-for-gcc virtual/nativesdk-${HOST_PREFIX}compilerlibs"
 PN = "golang-cross-canadian-${TRANSLATED_TARGET_ARCH}"
 
 export GOHOSTOS = "${BUILD_GOOS}"
@@ -9,8 +9,9 @@ export GOOS = "${HOST_GOOS}"
 export GOARCH = "${HOST_GOARCH}"
 export GOARM = "${HOST_GOARM}"
 export GOROOT_BOOTSTRAP = "${STAGING_LIBDIR_NATIVE}/go"
+export GOTOOLDIR_BOOTSTRAP = "${GOROOT_BOOTSTRAP}/pkg/tool/${BUILD_GOTUPLE}"
 export GOROOT_FINAL = "${libdir}/go"
-export CGO_ENABLED = "0"
+export CGO_ENABLED = "1"
 export CC_FOR_TARGET = "${HOST_CC}"
 export CXX_FOR_TARGET = "${HOST_CXX}"
 CC = "${@d.getVar('BUILD_CC', True).strip()}"

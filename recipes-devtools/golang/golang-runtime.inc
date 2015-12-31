@@ -11,6 +11,7 @@ export GOARCH = "${TARGET_GOARCH}"
 export GOARM = "${TARGET_GOARM}"
 export GOROOT_BOOTSTRAP = "${STAGING_LIBDIR_NATIVE}/go"
 export GOROOT_FINAL = "${libdir}/go"
+export GO_TARGET_INSTALL = "std"
 export CGO_ENABLED = "1"
 export CC_FOR_TARGET="${CC}"
 export CXX_FOR_TARGET="${CXX}"
@@ -25,7 +26,10 @@ do_compile() {
     rm -rf ${GOBIN} ${B}/pkg
     mkdir ${GOBIN}
     cd src
-    CC="${@d.getVar('BUILD_CC',True).strip()}" ./make.bash
+    CC="${@d.getVar('BUILD_CC',True).strip()}" GO_FLAGS="" ./make.bash
+    if [ "${GO_SHLIBS_SUPPORTED}" = "1" ]; then
+        CC="${@d.getVar('BUILD_CC',True).strip()}" GO_FLAGS="-buildmode=shared" ./make.bash
+    fi
 }
 
 do_install() {
@@ -44,11 +48,7 @@ do_install() {
 
 PACKAGES = "${PN} ${PN}-dev"
 ALLOW_EMPTY_${PN} = "1"
-FILES_${PN} = "${libdir}/go/pkg/${TARGET_GOTUPLE}/*${SOLIBSDEV} \
-	       ${libdir}/go/pkg/${TARGET_GOTUPLE}/*/*${SOLIBSDEV} \
-               ${libdir}/go/pkg/${TARGET_GOTUPLE}/*/*/*${SOLIBSDEV} \
-               ${libdir}/go/pkg/${TARGET_GOTUPLE}/*/*/*${SOLIBSDEV} \
-"
+FILES_${PN} = "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink/*${SOLIBSDEV}"
 FILES_${PN}-dev = "${libdir}/go"
 INSANE_SKIP_${PN} = "already-stripped ldflags"
 INSANE_SKIP_${PN}-dev = "ldflags staticdev file-rdeps arch"

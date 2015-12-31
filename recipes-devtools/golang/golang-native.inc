@@ -1,15 +1,24 @@
 inherit native
 
+SRC_URI_append = " http://golang.org/dl/go1.4.2.src.tar.gz;name=bootstrap;subdir=go1.4"
+SRC_URI[bootstrap.md5sum] = "907f85c8fa765d31f7f955836fec4049"
+SRC_URI[bootstrap.sha256sum] = "299a6fd8f8adfdce15bc06bde926e7b252ae8e24dd5b16b7d8791ed79e7b5e9b"
+
+
 export GOOS = "${BUILD_GOOS}"
 export GOARCH = "${BUILD_GOARCH}"
-export GOROOT_FINAL = "${STAGING_LIBDIR_NATIVE}/go"
+CC = "${@d.getVar('BUILD_CC', True).strip()}"
+
 export CGO_ENABLED = "1"
 
 do_configure() {
-    :
+    cd ${WORKDIR}/go1.4/go/src
+    GOROOT=${WORKDIR}/go1.4/go ./make.bash
 }
 
 do_compile() {
+    export GOROOT_FINAL="${STAGING_LIBDIR_NATIVE}/go"
+    export GOROOT_BOOTSTRAP="${WORKDIR}/go1.4/go"
     export GOBIN="${B}/bin"
     rm -rf ${GOBIN}
     mkdir ${GOBIN}

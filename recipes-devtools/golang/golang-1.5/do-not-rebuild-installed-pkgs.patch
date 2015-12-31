@@ -1,0 +1,43 @@
+Index: go/src/cmd/go/pkg.go
+===================================================================
+--- go.orig/src/cmd/go/pkg.go
++++ go/src/cmd/go/pkg.go
+@@ -17,7 +17,6 @@ import (
+ 	"os"
+ 	pathpkg "path"
+ 	"path/filepath"
+-	"runtime"
+ 	"sort"
+ 	"strconv"
+ 	"strings"
+@@ -1033,7 +1032,7 @@ func computeStale(pkgs ...*Package) {
+ // "go1.X[.Y]" for Go releases, and "devel +hash" at tip.
+ // Determine whether we are in a released copy by
+ // inspecting the version.
+-var isGoRelease = strings.HasPrefix(runtime.Version(), "go1")
++//var isGoRelease = strings.HasPrefix(runtime.Version(), "go1")
+ 
+ // isStale and computeBuildID
+ //
+@@ -1332,6 +1331,11 @@ func isStale(p *Package) bool {
+ 		return true
+ 	}
+ 
++	// XXX - for OE builds, make anything in GOROOT non-stale, to prevent
++	//       a package build from overwriting the build root. - XXX
++	if p.Standard || p.Root == goroot {
++		return false
++	}
+ 	// Package is stale if the expected build ID differs from the
+ 	// recorded build ID. This catches changes like a source file
+ 	// being removed from a package directory. See issue 3895.
+@@ -1370,9 +1374,6 @@ func isStale(p *Package) bool {
+ 	// (If a change to a release tree must be made by hand, the way to force the
+ 	// install is to run make.bash, which will remove the old package archives
+ 	// before rebuilding.)
+-	if p.Standard && isGoRelease {
+-		return false
+-	}
+ 
+ 	// Time-based staleness.
+ 

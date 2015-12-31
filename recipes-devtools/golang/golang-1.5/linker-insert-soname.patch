@@ -1,0 +1,20 @@
+Index: go/src/cmd/link/internal/ld/lib.go
+===================================================================
+--- go.orig/src/cmd/link/internal/ld/lib.go
++++ go/src/cmd/link/internal/ld/lib.go
+@@ -962,6 +962,7 @@ func hostlink() {
+ 		} else {
+ 			argv = append(argv, "-Wl,-Bsymbolic")
+ 			argv = append(argv, "-shared")
++			argv = append(argv, fmt.Sprintf("-Wl,-soname,%s", filepath.Base(outfile)))
+ 		}
+ 	case BuildmodeShared:
+ 		// TODO(mwhudson): unless you do this, dynamic relocations fill
+@@ -973,6 +974,7 @@ func hostlink() {
+ 		// anyway.
+ 		argv = append(argv, "-Wl,-Bsymbolic-functions")
+ 		argv = append(argv, "-shared")
++		argv = append(argv, fmt.Sprintf("-Wl,-soname,%s", file.path.Base(outfile)))
+ 	}
+ 
+ 	if Linkshared && Iself {

@@ -1,9 +1,12 @@
 require golang-common.inc
 
-PV = "1.5.2"
-GO_BASEVERSION = "1.5"
+PV = "1.6beta1"
+GO_BASEVERSION = "1.6"
 FILESEXTRAPATHS_prepend := "${FILE_DIRNAME}/golang-${GO_BASEVERSION}:"
 
+SRC_URI = "git://github.com/golang/go;branch=${SRCBRANCH}"
+SRCBRANCH ?= "master"
+SRCREV ?= "8db371b3d58a1c139f0854738f9962de05ca5d7a"
 
 SRC_URI += "\
        file://armhf-elf-header.patch \
@@ -18,6 +21,6 @@ SRC_URI += "\
        file://linker-insert-soname.patch \
 "
 
+S = "${WORKDIR}/git"
+
 LIC_FILES_CHKSUM = "file://LICENSE;md5=591778525c869cdde0ab5a1bf283cd81"
-SRC_URI[main.md5sum] = "38fed22e7b80672291e7cba7fb9c3475"
-SRC_URI[main.sha256sum] = "f3ddd624c00461641ce3d3a8d8e3c622392384ca7699e901b370a4eac5987a74"

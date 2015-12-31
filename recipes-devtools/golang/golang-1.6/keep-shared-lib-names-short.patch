@@ -1,0 +1,26 @@
+Index: git/src/cmd/go/build.go
+===================================================================
+--- git.orig/src/cmd/go/build.go
++++ git/src/cmd/go/build.go
+@@ -485,6 +485,7 @@ func runBuild(cmd *Command, args []strin
+ 		if libName, err := libname(args, pkgs); err != nil {
+ 			fatalf("%s", err.Error())
+ 		} else {
++			fmt.Printf("*** LIB NAME IS: %s\n", libName)
+ 			a = b.libaction(libName, pkgs, modeBuild, depMode)
+ 		}
+ 	} else {
+@@ -536,9 +537,12 @@ func libname(args []string, pkgs []*Pack
+ 		}
+ 	}
+ 	var haveNonMeta bool
+-	for _, arg := range args {
++	for i, arg := range args {
++		fmt.Printf("ARG[%d]: %s\n", i, arg)
+ 		if isMetaPackage(arg) {
+ 			appendName(arg)
++		} else if (i == 0 && arg != "./..." && strings.HasSuffix(arg, "/...")) {
++			appendName(strings.Replace(strings.TrimSuffix(arg, "/..."), "/", "-", -1) + "_all")
+ 		} else {
+ 			haveNonMeta = true
+ 		}
