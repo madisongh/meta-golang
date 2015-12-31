@@ -14,7 +14,7 @@ Index: go/src/cmd/link/internal/ld/lib.go
  		// anyway.
  		argv = append(argv, "-Wl,-Bsymbolic-functions")
  		argv = append(argv, "-shared")
-+		argv = append(argv, fmt.Sprintf("-Wl,-soname,%s", file.path.Base(outfile)))
++		argv = append(argv, fmt.Sprintf("-Wl,-soname,%s", filepath.Base(outfile)))
  	}
  
  	if Linkshared && Iself {
