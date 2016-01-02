@@ -9,13 +9,14 @@ DEPENDS_append = " ${DEPENDS_GOLANG}"
 export GO = "${HOST_PREFIX}go"
 export GOPATH = "${B}"
 GO_LINKSHARED ?= "${@['', '-linkshared'][d.getVar('GO_SHLIBS_SUPPORTED', True) == '1']}"
+GO_BUILD_SHLIBS ?= "${GO_SHLIBS_SUPPORTED}"
 export GOBUILDFLAGS ?= "-x -v"
 export GOPTESTBUILDFLAGS ?= "${GOBUILDFLAGS} -c"
 export GOPTESTFLAGS ?= "-test.v"
+GOBUILDFLAGS_prepend_task-compile = "${GO_PARALLEL_BUILD} "
 
 GO_BUILDBIN = "${B}/${GO_BUILD_BINDIR}"
 GO_BUILDBIN_class-native = "${B}/bin"
-
 
 S_GOROOT = "${WORKDIR}/go"
 S = "${S_GOROOT}/src"
@@ -63,40 +64,47 @@ do_configure[cleandirs] = "${B}"
 golang_do_configure() {
     ln -snf ${S} ${B}/
     rm -f ${B}/.go_compile_ptest.list
-    ${GO} list -f '{{.ImportPath}} {{.TestGoFiles}}' ${GO_SRCROOT}/... | grep -v '\[\]$' | awk '{print $1}' >${B}/.go_compile_ptest.list
-    ${GO} list -f '{{.ImportPath}} {{.Incomplete}}' ${GO_SRCROOT}/... | while read pkg inc; do
+    ${GO} list -f '{{.ImportPath}} {{.TestGoFiles}}' ${GO_SRCROOT}/... | grep -v '\[\]$' | grep -v '/vendor/' | awk '{print $1}' >${B}/.go_compile_ptest.list
+    ${GO} list -f '{{.ImportPath}} {{.Incomplete}}' ${GO_SRCROOT}/... | grep -v '/vendor/' | while read pkg inc; do
         if $inc; then
             bberror "${PN}: package $pkg is missing dependencies"
         fi
     done
 }
 
-do_compile[dirs] =+ "${B}/bin ${GO_TMPDIR}"
-do_compile[cleandirs] = "${B}/bin ${GO_TMPDIR}"
+do_compile[dirs] =+ "${B}/bin ${B}/pkg ${GO_TMPDIR}"
+do_compile[cleandirs] = "${B}/bin ${B}/pkg ${GO_TMPDIR}"
 
 golang_do_compile() {
     export TMPDIR="${GO_TMPDIR}"
-    if [ "${GO_SHLIBS_SUPPORTED}" = "1" ]; then
-        ${GO} install -buildmode=shared ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/...
-        ${GO} install -buildmode=exe ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/...
+    if [ "${GO_BUILD_SHLIBS}" = "1" ]; then
+        for btype in shared exe; do
+            rm -f ${B}/build-$btype.list
+            ${GO} install -n -buildmode=$btype ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/... 2>&1 | grep '^# ' | sed -e's,^# ,,' > ${B}/build-$btype.list
+            while read pkg; do
+                ${GO} install -buildmode=$btype ${GO_LINKSHARED} ${GOBUILDFLAGS} $pkg
+            done < ${B}/build-$btype.list
+        done
     else
-        ${GO} install ${GOBUILDFLAGS} ${GO_SRCROOT}/...
+        ${GO} install ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/...
     fi
 }
 
 golang_do_install() {
-    for f in ${B}/pkg/${TARGET_GOTUPLE}_dynlink/*${SOLIBSDEV}; do
-        if [ -e "$f" ]; then
-            chrpath -r "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink" $f
-        fi
-    done
+    if [ "${GO_BUILD_SHLIBS}" = "1" ]; then
+        for f in ${B}/pkg/${TARGET_GOTUPLE}_dynlink/*${SOLIBSDEV}; do
+            if [ -e "$f" ]; then
+                chrpath -r "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink" $f
+            fi
+        done
+    fi
     didbindir=""
     install -d ${D}${libdir}/go/src/${@os.path.dirname(d.getVar('GO_SRCROOT', True))}
     cp --preserve=mode,timestamps -R ${S} ${D}${libdir}/go/
     find ${D}${libdir}/go/src/${GO_SRCROOT} -type f -name '*.test' -exec rm {} \;
     for tgtfile in ${GO_BUILDBIN}/*; do
         [ -e $tgtfile ] || continue
-	if [ "${GO_SHLIBS_SUPPORTED}" = "1" ]; then
+        if [ "${GO_BUILD_SHLIBS}" = "1" ]; then
             chrpath -r "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink" $tgtfile
         fi
         if [ -z "$didbindir" ]; then                
@@ -156,9 +164,9 @@ EOF
 }
 
 PACKAGES = "${@bb.utils.contains('PTEST_ENABLED', '1', '${PN}-ptest', '', d)} ${PN} ${PN}-dev"
+PACKAGES_DYNAMIC = "^${PN}-lib.*"
 FILES_${PN} = "${bindir}/* ${sysconfdir} ${sharedstatedir} \
-               ${localstatedir} ${datadir}/${BPN} \
-	       ${libdir}/go/pkg/*_dynlink/*${SOLIBSDEV}"
+               ${localstatedir} ${datadir}/${BPN}"
 INSANE_SKIP_${PN} = "already-stripped ldflags dev-so textrel"
 INSANE_SKIP_${PN}-ptest = "already-stripped ldflags textrel"
 ALLOW_EMPTY_${PN} = "1"
@@ -166,5 +174,12 @@ FILES_${PN}-dev = "${libdir}"
 INSANE_SKIP_${PN}-dev = "staticdev"
 INHIBIT_PACKAGE_STRIP = "1"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+
+python populate_packages_prepend() {
+    libdir = d.expand("${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink")
+    pnbase = d.expand("${PN}-lib%s")
+    do_split_packages(d, libdir, '^lib(.*)' + '\\' + d.expand("${SOLIBSDEV}"), pnbase,
+                      'go library %s', prepend=True, extra_depends='')
+}
 
 EXPORT_FUNCTIONS do_unpack do_configure do_compile do_install
