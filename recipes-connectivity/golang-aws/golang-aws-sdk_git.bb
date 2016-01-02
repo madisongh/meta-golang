@@ -9,6 +9,8 @@ PV="1.0+git${SRCPV}"
 
 export GO15VENDOREXPERIMENT = "1"
 
+GO_BUILD_SHLIBS = "0"
+
 DEPENDS = "golang-stretchr-testify golang-go-ini-ini golang-jmespath-go-jmespath"
 
 inherit golang
