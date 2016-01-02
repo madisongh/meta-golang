@@ -104,7 +104,7 @@ golang_do_install() {
     find ${D}${libdir}/go/src/${GO_SRCROOT} -type f -name '*.test' -exec rm {} \;
     for tgtfile in ${GO_BUILDBIN}/*; do
         [ -e $tgtfile ] || continue
-        if [ "${GO_BUILD_SHLIBS}" = "1" ]; then
+        if [ "${GO_SHLIBS_SUPPORTED}" = "1" ]; then
             chrpath -r "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink" $tgtfile
         fi
         if [ -z "$didbindir" ]; then                
