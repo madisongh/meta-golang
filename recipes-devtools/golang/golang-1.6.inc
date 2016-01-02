@@ -16,7 +16,6 @@ SRC_URI += "\
        file://split-host-and-target-build.patch \
        file://gotooldir.patch \
        file://do-not-rebuild-installed-pkgs.patch \
-       file://keep-shared-lib-names-short.patch \
        file://gotooldir-cross-canadian.patch \
        file://linker-insert-soname.patch \
 "
