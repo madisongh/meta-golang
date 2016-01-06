@@ -40,10 +40,10 @@ END
 
 do_install() {
     install -d ${D}${libdir}/go
-    cp -a ${B}/pkg ${D}${libdir}/go/
+    cp --preserve=mode,timestamps -R ${B}/pkg ${D}${libdir}/go/
     install -d ${D}${libdir}/go/src
     (cd ${S}/src; for d in *; do \
-        [ -d $d ] && cp -a ${S}/src/$d ${D}${libdir}/go/src/; \
+        [ ! -d $d ] || cp --preserve=mode,timestamps -R ${S}/src/$d ${D}${libdir}/go/src/; \
     done)
     install -d ${D}${bindir} ${D}${libdir}/go/bin
     for f in ${B}/bin/*
@@ -53,9 +53,3 @@ do_install() {
         make_wrapper $base $base
     done
 }
-
-do_package[noexec] = "1"
-do_packagedata[noexec] = "1"
-do_package_write_ipk[noexec] = "1"
-do_package_write_deb[noexec] = "1"
-do_package_write_rpm[noexec] = "1"

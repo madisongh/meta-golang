@@ -32,7 +32,7 @@ do_install() {
     install -d ${D}${libdir}/go/bin
     install -d ${D}${libdir}/go/pkg/tool
     install -d ${D}${bindir}
-    cp -a ${S}/pkg/tool/${TARGET_GOTUPLE} ${D}${libdir}/go/pkg/tool/
+    cp --preserve=mode,timestamps -R ${S}/pkg/tool/${TARGET_GOTUPLE} ${D}${libdir}/go/pkg/tool/
     for f in ${B}/${GO_BUILD_BINDIR}/*
     do
         base=`basename $f`
