@@ -78,13 +78,12 @@ do_compile[cleandirs] = "${B}/bin ${B}/pkg ${GO_TMPDIR}"
 golang_do_compile() {
     export TMPDIR="${GO_TMPDIR}"
     if [ "${GO_BUILD_SHLIBS}" = "1" ]; then
-        for btype in shared exe; do
-            rm -f ${B}/build-$btype.list
-            ${GO} install -n -buildmode=$btype ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/... 2>&1 | grep '^# ' | sed -e's,^# ,,' > ${B}/build-$btype.list
-            while read pkg; do
-                ${GO} install -buildmode=$btype ${GO_LINKSHARED} ${GOBUILDFLAGS} $pkg
-            done < ${B}/build-$btype.list
-        done
+        rm -f ${B}/build-shared.list
+        ${GO} install -n -buildmode=shared ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/... 2>&1 | grep '^# ' | sed -e's,^# ,,' > ${B}/build-shared.list
+        while read pkg; do
+            ${GO} install -buildmode=shared ${GO_LINKSHARED} ${GOBUILDFLAGS} $pkg
+        done < ${B}/build-shared.list
+        ${GO} install -buildmode=exe ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/...
     else
         ${GO} install ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/...
     fi
