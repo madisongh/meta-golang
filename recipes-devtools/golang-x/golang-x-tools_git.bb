@@ -12,6 +12,10 @@ do_configure_prepend() {
     rm -rf ${S}/${GO_SRCROOT}/godoc/dl
     rm -rf ${S}/${GO_SRCROOT}/godoc/proxy
     rm -rf ${S}/${GO_SRCROOT}/godoc/short
+    if [ -f ${S}/${GO_SRCROOT}/go/gcimporter15/gcimporter_test16.go ]; then
+        (cd ${S}/${GO_SRCROOT}/go/gcimporter15; \
+	  mv gcimporter_test16.go gcimporter16_test.go)
+    fi
 }
 
 inherit golang
