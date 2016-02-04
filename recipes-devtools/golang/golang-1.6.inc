@@ -1,12 +1,12 @@
 require golang-common.inc
 
-PV = "1.6rc1"
+PV = "1.6rc2"
 GO_BASEVERSION = "1.6"
 FILESEXTRAPATHS_prepend := "${FILE_DIRNAME}/golang-${GO_BASEVERSION}:"
 
 SRC_URI = "git://github.com/golang/go;branch=${SRCBRANCH}"
 SRCBRANCH ?= "release-branch.go1.6"
-SRCREV ?= "036b8fd40b60830ca1d152f17148e52b96d8aa6c"
+SRCREV ?= "5d343bdfb140970cc37f099064226d104ca6d817"
 
 SRC_URI += "\
        file://armhf-elf-header.patch \
