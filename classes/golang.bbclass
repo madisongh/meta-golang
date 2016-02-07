@@ -98,8 +98,9 @@ golang_do_install() {
         done
     fi
     didbindir=""
-    install -d ${D}${libdir}/go/src/${@os.path.dirname(d.getVar('GO_SRCROOT', True))}
-    cp --preserve=mode,timestamps -R ${S} ${D}${libdir}/go/
+    srcparent="${@os.path.dirname(d.getVar('GO_SRCROOT', True))}"
+    install -d ${D}${libdir}/go/src/$srcparent
+    cp --preserve=mode,timestamps -R ${S}/${GO_SRCROOT} ${D}${libdir}/go/src/$srcparent/
     find ${D}${libdir}/go/src/${GO_SRCROOT} -type f -name '*.test' -exec rm {} \;
     for tgtfile in ${GO_BUILDBIN}/*; do
         [ -e $tgtfile ] || continue
