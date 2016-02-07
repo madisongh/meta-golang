@@ -17,6 +17,7 @@ inherit golang
 
 do_configure_prepend() {
     rm -rf ${S}/${GO_SRCROOT}/awstesting/integration
+    rm -rf ${S}/${GO_SRCROOT}/awstesting/performance
     rm -rf ${S}/${GO_SRCROOT}/awsmigrate
     rm -rf ${S}/${GO_SRCROOT}/example
 }
