@@ -129,6 +129,7 @@ do_compile_ptest() {
 }
 
 do_install_ptest_base() {
+    test -f "${B}/.go_compiled_tests.list" || exit 0
     tests=""
     while read test; do
         tests="$tests${tests:+ }${test%.test}"
