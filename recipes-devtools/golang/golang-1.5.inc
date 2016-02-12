@@ -15,6 +15,7 @@ SRC_URI += "\
        file://do-not-rebuild-installed-pkgs.patch \
        file://gotooldir-cross-canadian.patch \
        file://linker-insert-soname.patch \
+       file://linker-copyn-workaround.patch \
 "
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=591778525c869cdde0ab5a1bf283cd81"
