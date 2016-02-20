@@ -9,6 +9,7 @@ PV="1.0+git${SRCPV}"
 GO_SRCROOT = "golang.org/x/tools"
 
 do_configure_prepend() {
+    rm -rf ${S}/${GO_SRCROOT}/cmd/bundle
     rm -rf ${S}/${GO_SRCROOT}/godoc/dl
     rm -rf ${S}/${GO_SRCROOT}/godoc/proxy
     rm -rf ${S}/${GO_SRCROOT}/godoc/short
