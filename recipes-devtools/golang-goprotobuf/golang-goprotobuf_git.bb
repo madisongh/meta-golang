@@ -11,4 +11,6 @@ DEPENDS = "golang-x-net"
 
 inherit golang
 
+RDEPENDS_${PN}-dev += "bash"
+
 BBCLASSEXTEND = "native nativesdk"
