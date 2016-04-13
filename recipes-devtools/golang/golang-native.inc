@@ -17,7 +17,7 @@ export CGO_ENABLED = "1"
 
 do_configure() {
     cd ${WORKDIR}/go1.4/go/src
-    GOROOT=${WORKDIR}/go1.4/go ./make.bash
+    CGO_ENABLED=0 GOROOT=${WORKDIR}/go1.4/go ./make.bash
 }
 
 do_compile() {
