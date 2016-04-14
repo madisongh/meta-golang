@@ -25,7 +25,7 @@ Recipe naming convention:
 
 This layer depends on:
 URI: git://git.openembedded.org/openembedded-core
-branches: fido, jethro, master
+branches: fido, jethro, krogoth, master
 
 
 Contributing
