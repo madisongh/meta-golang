@@ -1,8 +1,8 @@
 SUMMARY = "Go testing tool with web UI" 
 HOMEPAGE = "http://goconvey.co"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://${GO_SRCROOT}/LICENSE.md;md5=332cd9cbee8d58f5f2f5eb8db06d9e72 \
-                    file://${GO_SRCROOT}/vendor/github.com/smartystreets/assertions/LICENSE.md;md5=463753b1c52cffde85983f6ab21b71f5"
+LIC_FILES_CHKSUM = "file://${GO_SRCROOT}/LICENSE.md;md5=4f3d0cac23eaa070c40e054fad4e78a8 \
+                    file://${GO_SRCROOT}/vendor/github.com/smartystreets/assertions/LICENSE.md;md5=019e27fed5ea0aeabe798d69cb314a67"
 GO_SRCROOT = "github.com/smartystreets/goconvey"
 SRC_URI = "git://${GO_SRCROOT};name=goconvey \
            git://github.com/smartystreets/assertions;name=assertions;destsuffix=${GO_SRCROOT}/vendor/github.com/smartystreets/assertions"
