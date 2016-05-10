@@ -12,4 +12,6 @@ DEPENDS = "golang-x-text golang-x-crypto"
 
 inherit golang
 
+PTEST_ENABLED = ""
+
 BBCLASSEXTEND = "native nativesdk"

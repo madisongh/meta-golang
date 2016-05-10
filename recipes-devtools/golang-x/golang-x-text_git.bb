@@ -11,4 +11,6 @@ CGO_ENABLED = "1"
 
 inherit golang
 
+PTEST_ENABLED = ""
+
 BBCLASSEXTEND = "native nativesdk"

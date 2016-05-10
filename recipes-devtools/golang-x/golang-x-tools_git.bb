@@ -21,6 +21,8 @@ do_configure_prepend() {
 
 inherit golang
 
+PTEST_ENABLED = ""
+
 DEPENDS += "golang-x-net"
 RDEPENDS_${PN}-dev = "bash"
 
