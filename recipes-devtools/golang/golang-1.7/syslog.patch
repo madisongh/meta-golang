@@ -1,0 +1,59 @@
+Index: go/src/log/syslog/syslog.go
+===================================================================
+--- go.orig/src/log/syslog/syslog.go
++++ go/src/log/syslog/syslog.go
+@@ -26,6 +26,9 @@ type Priority int
+ const severityMask = 0x07
+ const facilityMask = 0xf8
+ 
++var writeTimeout = 1 * time.Second
++var connectTimeout = 1 * time.Second
++
+ const (
+ 	// Severity.
+ 
+@@ -93,6 +96,7 @@ type Writer struct {
+ type serverConn interface {
+ 	writeString(p Priority, hostname, tag, s, nl string) error
+ 	close() error
++	setWriteDeadline(t time.Time) error
+ }
+ 
+ type netConn struct {
+@@ -267,7 +271,11 @@ func (w *Writer) write(p Priority, msg s
+ 		nl = "\n"
+ 	}
+ 
+-	err := w.conn.writeString(p, w.hostname, w.tag, msg, nl)
++	err := w.conn.setWriteDeadline(time.Now().Add(writeTimeout))
++	if err != nil {
++		return 0, err
++	}
++	err = w.conn.writeString(p, w.hostname, w.tag, msg, nl)
+ 	if err != nil {
+ 		return 0, err
+ 	}
+@@ -299,6 +307,10 @@ func (n *netConn) close() error {
+ 	return n.conn.Close()
+ }
+ 
++func (n *netConn) setWriteDeadline(t time.Time) error {
++	return n.conn.SetWriteDeadline(t)
++}
++
+ // NewLogger creates a log.Logger whose output is written to
+ // the system log service with the specified priority. The logFlag
+ // argument is the flag set passed through to log.New to create
+Index: go/src/log/syslog/syslog_unix.go
+===================================================================
+--- go.orig/src/log/syslog/syslog_unix.go
++++ go/src/log/syslog/syslog_unix.go
+@@ -19,7 +19,7 @@ func unixSyslog() (conn serverConn, err
+ 	logPaths := []string{"/dev/log", "/var/run/syslog", "/var/run/log"}
+ 	for _, network := range logTypes {
+ 		for _, path := range logPaths {
+-			conn, err := net.Dial(network, path)
++			conn, err := net.DialTimeout(network, path, connectTimeout)
+ 			if err != nil {
+ 				continue
+ 			} else {
