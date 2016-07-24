@@ -12,6 +12,7 @@ TARGET_GOTUPLE = "${TARGET_GOOS}_${TARGET_GOARCH}"
 GO_BUILD_BINDIR = "${@['bin/${HOST_GOTUPLE}','bin'][d.getVar('BUILD_GOTUPLE',True) == d.getVar('HOST_GOTUPLE',True)]}"
 GO_SHLIBS_SUPPORTED ?= "${@golang_arch_supports_shlibs(d.getVar('TARGET_GOARCH', True), d)}"
 GO_SHLIBS_SUPPORTED_class-native = "0"
+GO_SHLIB_ARCHS ??= "amd64"
 
 def golang_map_arch(a, d):
     import re
