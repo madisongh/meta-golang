@@ -1,5 +1,9 @@
 inherit golang-osarchmap ptest
 
+GO_PARALLEL_BUILD ?= "${@d.getVar('PARALLEL_MAKE', True).replace('-j', '-p')}"
+BB_HASHBASE_WHITELIST_append = " GO_PARALLEL_BUILD GO_TMPDIR"
+BB_HASHCONFIG_WHITELIST_append = " GO_PARALLEL_BUILD GO_TMPDIR"
+
 DEPENDS_GOLANG_class-target = "virtual/${TARGET_PREFIX}golang virtual/${TARGET_PREFIX}golang-runtime"
 DEPENDS_GOLANG_class-nativesdk = "virtual/${TARGET_PREFIX}golang-crosssdk virtual/${TARGET_PREFIX}golang-runtime"
 DEPENDS_GOLANG_class-native = "golang-native"
