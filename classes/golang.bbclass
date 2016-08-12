@@ -37,6 +37,7 @@ GOTOOLDIR_class-native = "${STAGING_LIBDIR_NATIVE}/go/pkg/tool/${BUILD_GOTUPLE}"
 export GOTOOLDIR
 
 export CGO_ENABLED ?= "${@['0', '1'][d.getVar('GO_SHLIBS_SUPPORTED', True) == '1']}"
+export CGO_LDFLAGS ?= "${LDFLAGS}"
 
 do_unpack[dirs] = "${S_GOROOT}/src"
 python golang_do_unpack() {
