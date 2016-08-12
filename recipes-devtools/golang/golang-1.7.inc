@@ -1,7 +1,7 @@
 require golang-common.inc
 
 DEFAULT_PREFERENCE = "-1"
-PV = "1.7rc5"
+PV = "1.7rc6"
 GO_BASEVERSION = "1.7"
 FILESEXTRAPATHS_prepend := "${FILE_DIRNAME}/golang-${GO_BASEVERSION}:"
 
@@ -18,5 +18,5 @@ SRC_URI += "\
 "
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707"
-SRC_URI[main.md5sum] = "c3938621323bbab261f9ade7c0ca4599"
-SRC_URI[main.sha256sum] = "206c90e797e66335fe134052568f63a493f27b86f765087add390d5fb4c596c4"
+SRC_URI[main.md5sum] = "27f1eb30f443914063af1ac13ff08696"
+SRC_URI[main.sha256sum] = "a289943548b838c7ef606a37836d1db080a3cb3c6df4e76456e23609b8505d05"
