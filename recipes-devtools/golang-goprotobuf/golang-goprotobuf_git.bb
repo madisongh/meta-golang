@@ -11,6 +11,10 @@ DEPENDS = "golang-x-net"
 
 inherit golang
 
+do_configure_prepend() {
+    rm -f ${S}/${GO_SRCROOT}/_conformance/_conformance
+}
+
 RDEPENDS_${PN}-dev += "bash"
 
 BBCLASSEXTEND = "native nativesdk"
