@@ -1,6 +1,5 @@
 require golang-common.inc
 
-DEFAULT_PREFERENCE = "-1"
 PV = "1.7"
 GO_BASEVERSION = "1.7"
 FILESEXTRAPATHS_prepend := "${FILE_DIRNAME}/golang-${GO_BASEVERSION}:"
