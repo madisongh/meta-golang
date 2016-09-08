@@ -4,9 +4,9 @@ nonstaging_libdir := "${libdir}"
 
 inherit native
 
-SRC_URI_append = " http://golang.org/dl/go1.4.2.src.tar.gz;name=bootstrap;subdir=go1.4"
-SRC_URI[bootstrap.md5sum] = "907f85c8fa765d31f7f955836fec4049"
-SRC_URI[bootstrap.sha256sum] = "299a6fd8f8adfdce15bc06bde926e7b252ae8e24dd5b16b7d8791ed79e7b5e9b"
+SRC_URI_append = " http://golang.org/dl/go1.4.3.src.tar.gz;name=bootstrap;subdir=go1.4"
+SRC_URI[bootstrap.md5sum] = "dfb604511115dd402a77a553a5923a04"
+SRC_URI[bootstrap.sha256sum] = "9947fc705b0b841b5938c48b22dc33e9647ec0752bae66e50278df4f23f64959"
 
 
 export GOOS = "${BUILD_GOOS}"
