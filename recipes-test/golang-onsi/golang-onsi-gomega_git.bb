@@ -7,7 +7,7 @@ SRC_URI = "git://${GO_SRCROOT}"
 SRCREV = "${AUTOREV}"
 PV="1.0+git${SRCPV}"
 
-DEPENDS = "golang-goprotobuf"
+DEPENDS = "golang-goprotobuf golang-gopkg-in-yaml-v2"
 
 inherit golang
 
