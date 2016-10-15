@@ -14,8 +14,6 @@ PV="1.0+git${SRCPV}"
 
 GO_SRCROOT = "golang.org/x/crypto"
 
-export GO15VENDOREXPERIMENT = "1"
-
 inherit golang
 
 PTEST_ENABLED = ""
