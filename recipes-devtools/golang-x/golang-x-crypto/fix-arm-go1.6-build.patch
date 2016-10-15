@@ -1,0 +1,14 @@
+Index: src/golang.org/x/crypto/poly1305/sum_ref.go
+===================================================================
+--- src.orig/golang.org/x/crypto/poly1305/sum_ref.go
++++ src/golang.org/x/crypto/poly1305/sum_ref.go
+@@ -2,7 +2,8 @@
+ // Use of this source code is governed by a BSD-style
+ // license that can be found in the LICENSE file.
+ 
+-// +build !amd64,!arm gccgo appengine !go1.7
++// +build !amd64 gccgo appengine !go1.7
++// +build !arm gccgo appengine nacl
+ 
+ package poly1305
+ 
