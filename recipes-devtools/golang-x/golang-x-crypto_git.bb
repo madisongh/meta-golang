@@ -4,7 +4,8 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${GO_SRCROOT}/LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707"
 SRC_URI = "git://github.com/golang/crypto;name=crypto \
            git://github.com/golang/net;name=net;destsuffix=${GO_SRC_PARENT}/vendor/golang.org/x/net \
-           git://github.com/golang/text;name=text;destsuffix=${GO_SRC_PARENT}/vendor/golang.org/x/text"
+           git://github.com/golang/text;name=text;destsuffix=${GO_SRC_PARENT}/vendor/golang.org/x/text \
+           file://fix-arm-go1.6-build.patch"
 SRCREV_crypto = "${AUTOREV}"
 SRCREV_net = "${AUTOREV}"
 SRCREV_text = "${AUTOREV}"
