@@ -15,8 +15,6 @@ GO_SRCROOT = "golang.org/x/oauth2"
 
 DEPENDS = "golang-x-net"
 
-export GO15VENDOREXPERIMENT = "1"
-
 inherit golang
 
 # Tests require the google appengine package
