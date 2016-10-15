@@ -12,7 +12,5 @@ PV="1.0+git${SRCPV}"
 
 DEPENDS = "golang-davecgh-go-spew golang-pmezard-go-difflib"
 
-export GO15VENDOREXPERIMENT = "1"
-
 inherit golang
 
