@@ -13,8 +13,6 @@ PV="1.0+git${SRCPV}"
 
 DEPENDS = "golang-x-net golang-jtolds-gls"
 
-export GO15VENDOREXPERIMENT = "1"
-
 inherit golang
 
 PTEST_ENABLED = "0"
