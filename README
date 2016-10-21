@@ -9,10 +9,8 @@ A repository for Go language recipes, including:
  * A bbclass for simplifying the creation of recipes for Go packages
      - automatically generates ptest packages using go test framework
 
-Package dependencies are specified in recipes.  By default,
-packages use AUTOREV floating revisions, but you can lock down
-specific versions using SRCREV overrides for packages you include
-in your build.
+All Go package dependencies must be specified in the DEPENDS
+for a recipe.
 
 Recipe naming convention:
 
