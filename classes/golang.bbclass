@@ -27,6 +27,8 @@ S = "${WORKDIR}/go/src"
 B = "${WORKDIR}/build"
 GO_TMPDIR = "${WORKDIR}/go-tmp"
 
+GO_INSTALL ?= "${GO_SRCROOT}/..."
+
 GOROOT = "${STAGING_LIBDIR}/go"
 GOROOT_class-native = "${STAGING_LIBDIR_NATIVE}/go"
 GOROOT_class-nativesdk = "${STAGING_DIR_TARGET}${libdir}/go"
@@ -64,7 +66,7 @@ python golang_do_unpack() {
 }
 
 golang_list_packages() {
-    ${GO} list -f '{{.ImportPath}}' ${GO_SRCROOT}/... | grep -v '/vendor/'
+    ${GO} list -f '{{.ImportPath}}' ${GO_INSTALL} | grep -v '/vendor/'
 }
 
 do_configure[dirs] = "${B}"
@@ -72,8 +74,8 @@ do_configure[cleandirs] = "${B}"
 golang_do_configure() {
     ln -snf ${S} ${B}/
     rm -f ${B}/.go_compile_ptest.list
-    ${GO} list -f '{{.ImportPath}} {{.TestGoFiles}}' ${GO_SRCROOT}/... | grep -v '\[\]$' | grep -v '/vendor/' | awk '{print $1}' >${B}/.go_compile_ptest.list
-    ${GO} list -f '{{.ImportPath}} {{.Incomplete}}' ${GO_SRCROOT}/... | grep -v '/vendor/' | while read pkg inc; do
+    ${GO} list -f '{{.ImportPath}} {{.TestGoFiles}}' ${GO_INSTALL} | grep -v '\[\]$' | grep -v '/vendor/' | awk '{print $1}' >${B}/.go_compile_ptest.list
+    ${GO} list -f '{{.ImportPath}} {{.Incomplete}}' ${GO_INSTALL} | grep -v '/vendor/' | while read pkg inc; do
         if $inc; then
             bberror "${PN}: package $pkg is missing dependencies"
         fi
