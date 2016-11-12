@@ -2,31 +2,22 @@ SUMMARY = "Go tools (subset)"
 HOMEPAGE = "https://godoc.org/golang.org/x/tools"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${GO_SRCROOT}/LICENSE;md5=5d4950ecb7b26d2c5e4e7b4e0dd74707"
-SRC_URI = "git://github.com/golang/tools"
+SRC_URI = "git://github.com/golang/tools;name=tools \
+           git://github.com/golang/net;name=net;destsuffix=${GO_SRCROOT}/vendor/golang.org/x/net"
 
 require golang-x-srcrevs.inc
 
-SRCREV = "${GOLANG_X_TOOLS_SRCREV}"
+SRCREV_tools = "${GOLANG_X_TOOLS_SRCREV}"
+SRCREV_net = "${GOLANG_X_NET_SRCREV}"
+SRCREV_FORMAT = "tools+net"
 PV="1.0+git${SRCPV}"
 
 GO_SRCROOT = "golang.org/x/tools"
-
-do_configure_prepend() {
-    rm -rf ${S}/${GO_SRCROOT}/cmd/bundle
-    rm -rf ${S}/${GO_SRCROOT}/godoc/dl
-    rm -rf ${S}/${GO_SRCROOT}/godoc/proxy
-    rm -rf ${S}/${GO_SRCROOT}/godoc/short
-    if [ -f ${S}/${GO_SRCROOT}/go/gcimporter15/gcimporter_test16.go ]; then
-        (cd ${S}/${GO_SRCROOT}/go/gcimporter15; \
-	  mv gcimporter_test16.go gcimporter16_test.go)
-    fi
-}
 
 inherit golang
 
 PTEST_ENABLED = ""
 
-DEPENDS += "golang-x-net"
 RDEPENDS_${PN}-dev = "bash"
 
 BBCLASSEXTEND = "native"
