@@ -65,6 +65,10 @@ python golang_do_unpack() {
         raise bb.build.FuncFailed(e)
 }
 
+golang_list_packages() {
+    ${GO} list -f '{{.ImportPath}}' ${GO_SRCROOT}/... | grep -v '/vendor/'
+}
+
 do_configure[dirs] = "${B}"
 do_configure[cleandirs] = "${B}"
 golang_do_configure() {
@@ -85,13 +89,13 @@ golang_do_compile() {
     export TMPDIR="${GO_TMPDIR}"
     if [ "${GO_BUILD_SHLIBS}" = "1" ]; then
         rm -f ${B}/build-shared.list
-        ${GO} install -n -buildmode=shared ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/... 2>&1 | grep '^# ' | sed -e's,^# ,,' > ${B}/build-shared.list
+        ${GO} install -n -buildmode=shared ${GO_LINKSHARED} ${GOBUILDFLAGS} `golang_list_packages` 2>&1 | grep '^# ' | sed -e's,^# ,,' > ${B}/build-shared.list
         while read pkg; do
             ${GO} install -buildmode=shared ${GO_LINKSHARED} ${GOBUILDFLAGS} $pkg
         done < ${B}/build-shared.list
-        ${GO} install -buildmode=exe ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/...
+        ${GO} install -buildmode=exe ${GO_LINKSHARED} ${GOBUILDFLAGS} `golang_list_packages`
     else
-        ${GO} install ${GO_LINKSHARED} ${GOBUILDFLAGS} ${GO_SRCROOT}/...
+        ${GO} install ${GO_LINKSHARED} ${GOBUILDFLAGS} `golang_list_packages`
     fi
 }
 
