@@ -76,7 +76,7 @@ golang_do_configure() {
     ln -snf ${S} ${B}/
     rm -f ${B}/.go_compile_ptest.list
     ${GO} list -f '{{.ImportPath}} {{.TestGoFiles}}' ${GO_INSTALL} | grep -v '\[\]$' | egrep -v '${GO_INSTALL_FILTEROUT}' | awk '{print $1}' >${B}/.go_compile_ptest.list
-    ${GO} list -f '{{.ImportPath}} {{.Incomplete}}' ${GO_INSTALL} | egrep -v '${GO_INSTALL_FILTEROUT}' | while read pkg inc; do
+    ${GO} list -f '{{.ImportPath}} {{.Incomplete}}' `golang_list_packages` | while read pkg inc; do
         if $inc; then
             bberror "${PN}: package $pkg is missing dependencies"
         fi
