@@ -23,9 +23,7 @@ GOBUILDFLAGS_prepend_task-compile = "${GO_PARALLEL_BUILD} "
 GO_BUILDBIN = "${B}/${GO_BUILD_BINDIR}"
 GO_BUILDBIN_class-native = "${B}/bin"
 
-S_GOROOT = "${WORKDIR}/go"
-S = "${S_GOROOT}/src"
-GO_SRC_PARENT = "${@os.path.dirname(d.getVar('GO_SRCROOT', True))}"
+S = "${WORKDIR}/go/src"
 B = "${WORKDIR}/build"
 GO_TMPDIR = "${WORKDIR}/go-tmp"
 
@@ -40,7 +38,7 @@ export GOTOOLDIR
 export CGO_ENABLED ?= "${@['0', '1'][d.getVar('GO_SHLIBS_SUPPORTED', True) == '1']}"
 export CGO_LDFLAGS ?= "${LDFLAGS}"
 
-do_unpack[dirs] = "${S_GOROOT}/src"
+do_unpack[dirs] = "${S}"
 python golang_do_unpack() {
     src_uri = (d.getVar('SRC_URI', True) or "").split()
     if len(src_uri) == 0:
