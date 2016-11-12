@@ -103,10 +103,8 @@ golang_do_install() {
         done
     fi
     didbindir=""
-    srcparent="${@os.path.dirname(d.getVar('GO_SRCROOT', True))}"
-    install -d ${D}${libdir}/go/src/$srcparent
-    cp --preserve=mode,timestamps -R ${S}/${GO_SRCROOT} ${D}${libdir}/go/src/$srcparent/
-    find ${D}${libdir}/go/src/${GO_SRCROOT} -type f -name '*.test' -exec rm {} \;
+    install -d ${D}${libdir}/go/src/${GO_SRCROOT}
+    tar -C ${S}/${GO_SRCROOT} -c -f- --exclude-vcs --exclude "*.test" . | tar -C ${D}${libdir}/go/src/${GO_SRCROOT} --no-same-owner -x -f-
     for tgtfile in ${GO_BUILDBIN}/*; do
         [ -e $tgtfile ] || continue
         if [ "${GO_SHLIBS_SUPPORTED}" = "1" ]; then
