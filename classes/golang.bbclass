@@ -37,6 +37,7 @@ export GOROOT
 GOTOOLDIR = "${STAGING_LIBDIR_NATIVE}/${TARGET_SYS}/go/pkg/tool/${BUILD_GOTUPLE}"
 GOTOOLDIR_class-native = "${STAGING_LIBDIR_NATIVE}/go/pkg/tool/${BUILD_GOTUPLE}"
 export GOTOOLDIR
+export GO_SHLIBDIR ?= "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink"
 
 export CGO_ENABLED ?= "${@['0', '1'][d.getVar('GO_SHLIBS_SUPPORTED', True) == '1']}"
 export CGO_LDFLAGS ?= "${LDFLAGS}"
@@ -104,7 +105,7 @@ golang_do_install() {
     if [ "${GO_BUILD_SHLIBS}" = "1" ]; then
         for f in ${B}/pkg/${TARGET_GOTUPLE}_dynlink/*${SOLIBSDEV}; do
             if [ -e "$f" ]; then
-                chrpath -r "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink" $f
+                chrpath -r "${GO_SHLIBDIR}" $f
             fi
         done
     fi
@@ -114,7 +115,7 @@ golang_do_install() {
     for tgtfile in ${GO_BUILDBIN}/*; do
         [ -e $tgtfile ] || continue
         if [ "${GO_SHLIBS_SUPPORTED}" = "1" ]; then
-            chrpath -r "${libdir}/go/pkg/${TARGET_GOTUPLE}_dynlink" $tgtfile
+            chrpath -r "${GO_SHLIBDIR}" $tgtfile
         fi
         if [ -z "$didbindir" ]; then                
             install -d ${D}${bindir}
