@@ -13,8 +13,10 @@ DEPENDS_append = " ${DEPENDS_GOLANG}"
 export GO = "${HOST_PREFIX}go"
 export GOPATH = "${B}"
 GO_LINKSHARED ?= "${@['', '-linkshared'][d.getVar('GO_SHLIBS_SUPPORTED', True) == '1']}"
+GO_LDFLAGS_SHARED ?= "${@['', '-r ${GO_SHLIBDIR}'][d.getVar('GO_SHLIBS_SUPPORTED', True) == '1']}"
+GO_EXTLDFLAGS_SHARED ?= "${@['', '-Wl,-rpath-link=${STAGING_DIR_TARGET}${GO_SHLIBDIR}'][d.getVar('GO_SHLIBS_SUPPORTED', True) == '1']}"
 GO_BUILD_SHLIBS ?= "0"
-GO_EXTLDFLAGS ?= '-ldflags="-extldflags '${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS} ${LDFLAGS}'"'
+GO_EXTLDFLAGS ?= '-ldflags="${GO_LDFLAGS_SHARED} -extldflags '${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS} ${GO_EXTLDFLAGS_SHARED} ${LDFLAGS}'"'
 export GOBUILDFLAGS ?= "-x -v ${GO_EXTLDFLAGS}"
 export GOPTESTBUILDFLAGS ?= "${GOBUILDFLAGS} -c"
 export GOPTESTFLAGS ?= "-test.v"
@@ -102,21 +104,11 @@ golang_do_compile() {
 }
 
 golang_do_install() {
-    if [ "${GO_BUILD_SHLIBS}" = "1" ]; then
-        for f in ${B}/pkg/${TARGET_GOTUPLE}_dynlink/*${SOLIBSDEV}; do
-            if [ -e "$f" ]; then
-                chrpath -r "${GO_SHLIBDIR}" $f
-            fi
-        done
-    fi
     didbindir=""
     install -d ${D}${libdir}/go/src/${GO_SRCROOT}
     tar -C ${S}/${GO_SRCROOT} -c -f- --exclude-vcs --exclude "*.test" . | tar -C ${D}${libdir}/go/src/${GO_SRCROOT} --no-same-owner -x -f-
     for tgtfile in ${GO_BUILDBIN}/*; do
         [ -e $tgtfile ] || continue
-        if [ "${GO_SHLIBS_SUPPORTED}" = "1" ]; then
-            chrpath -r "${GO_SHLIBDIR}" $tgtfile
-        fi
         if [ -z "$didbindir" ]; then                
             install -d ${D}${bindir}
             didbindir="yes"
