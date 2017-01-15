@@ -20,4 +20,6 @@ inherit golang
 
 PTEST_ENABLED = ""
 
+RDEPENDS_${PN}-dev = "bash"
+
 BBCLASSEXTEND = "native nativesdk"
