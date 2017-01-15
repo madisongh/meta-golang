@@ -19,5 +19,6 @@ inherit golang
 PTEST_ENABLED = ""
 
 RDEPENDS_${PN}-dev = "bash"
+INSANE_SKIP_${PN}-dev += "arch"
 
 BBCLASSEXTEND = "native"
