@@ -31,6 +31,8 @@ def golang_map_arm(a, f, d):
     import re
     if re.match('arm.*', a) and re.match('arm.*7.*', f):
         return '7'
+    if re.match('arm.*', a) and re.match('arm.*5.*', f):
+        return '5'
     return ''
 
 def golang_map_os(o, d):
