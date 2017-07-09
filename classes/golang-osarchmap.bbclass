@@ -24,6 +24,8 @@ def golang_map_arch(a, d):
         return 'arm'
     elif re.match('aarch64.*', a):
         return 'arm64'
+    elif re.match('mipsel', a):
+        return 'mipsle'
     else:
         bb.error("cannot map '%s' to a Go architecture" % a)
 
