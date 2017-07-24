@@ -1,6 +1,23 @@
 inherit golang-osarchmap ptest
 
-GO_PARALLEL_BUILD ?= "${@d.getVar('PARALLEL_MAKE', True).replace('-j', '-p')}"
+def get_go_parallel_make(d):
+    pm = (d.getVar('PARALLEL_MAKE') or '').split()
+    # look for '-j' and throw other options (e.g. '-l') away
+    # because they might have a different meaning in golang
+    while pm:
+        opt = pm.pop(0)
+        if opt == '-j':
+            v = pm.pop(0)
+        elif opt.startswith('-j'):
+            v = opt[2:].strip()
+        else:
+            continue
+
+        return '-p %d' % int(v)
+
+    return ""
+
+GO_PARALLEL_BUILD ?= "${@get_go_parallel_make(d)}"
 BB_HASHBASE_WHITELIST_append = " GO_PARALLEL_BUILD GO_TMPDIR"
 BB_HASHCONFIG_WHITELIST_append = " GO_PARALLEL_BUILD GO_TMPDIR"
 
