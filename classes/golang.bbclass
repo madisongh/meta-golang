@@ -1,7 +1,7 @@
 inherit golang-osarchmap ptest
 
 def get_go_parallel_make(d):
-    pm = (d.getVar('PARALLEL_MAKE') or '').split()
+    pm = (d.getVar('PARALLEL_MAKE', True) or '').split()
     # look for '-j' and throw other options (e.g. '-l') away
     # because they might have a different meaning in golang
     while pm:
