@@ -128,7 +128,7 @@ golang_do_install() {
 }
 
 do_compile_ptest() {
-    curwpd=$PWD
+    curpwd=$PWD
     rm -f ${B}/.go_compiled_tests.list
     while read pkg; do
         cd ${S}/$pkg
