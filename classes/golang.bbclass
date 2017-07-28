@@ -120,6 +120,7 @@ golang_do_install() {
 }
 
 do_compile_ptest() {
+    export TMPDIR="${GO_TMPDIR}"
     curpwd=$PWD
     rm -f ${B}/.go_compiled_tests.list
     while read pkg; do
