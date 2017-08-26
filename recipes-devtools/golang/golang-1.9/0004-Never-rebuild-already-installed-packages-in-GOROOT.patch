@@ -1,0 +1,77 @@
+From 7d6de6412e6c08c53a6639dfe5dd521418d8f0b6 Mon Sep 17 00:00:00 2001
+From: Matt Madison <matt@madison.systems>
+Date: Sun, 15 Jan 2017 05:22:55 -0800
+Subject: [PATCH 4/6] Never rebuild already-installed packages in GOROOT
+
+For OE builds, we never want pacakges that have already been
+installed in the build root to be modified during a compilation,
+so change the package-finding logic to always treat them as
+precious.
+
+Upstream-Status: Pending
+Signed-off-by: Matt Madison <matt@madison.systems>
+---
+ src/cmd/go/internal/load/pkg.go | 11 ++++++-----
+ src/make.bash                   |  3 +++
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/src/cmd/go/internal/load/pkg.go b/src/cmd/go/internal/load/pkg.go
+index 60de666..8a64768 100644
+--- a/src/cmd/go/internal/load/pkg.go
++++ b/src/cmd/go/internal/load/pkg.go
+@@ -14,7 +14,6 @@ import (
+ 	"os"
+ 	pathpkg "path"
+ 	"path/filepath"
+-	"runtime"
+ 	"sort"
+ 	"strings"
+ 	"unicode"
+@@ -1208,7 +1207,7 @@ func ComputeStale(pkgs ...*Package) {
+ // "go1.X[.Y]" for Go releases, and "devel +hash" at tip.
+ // Determine whether we are in a released copy by
+ // inspecting the version.
+-var isGoRelease = strings.HasPrefix(runtime.Version(), "go1")
++//var isGoRelease = strings.HasPrefix(runtime.Version(), "go1")
+ 
+ // isStale and computeBuildID
+ //
+@@ -1517,6 +1516,11 @@ func isStale(p *Package) (bool, string) {
+ 		return true, "cannot stat install target"
+ 	}
+ 
++	// XXX - for OE builds, make anything in GOROOT non-stale, to prevent
++	//       a package build from overwriting the build root. - XXX
++	if p.Goroot && os.Getenv("GOROOT_OVERRIDE") != "1" {
++		return false, "OE specific: GOROOT and standard packages do not get rebuilt"
++	}
+ 	// Package is stale if the expected build ID differs from the
+ 	// recorded build ID. This catches changes like a source file
+ 	// being removed from a package directory. See issue 3895.
+@@ -1555,9 +1559,6 @@ func isStale(p *Package) (bool, string) {
+ 	// (If a change to a release tree must be made by hand, the way to force the
+ 	// install is to run make.bash, which will remove the old package archives
+ 	// before rebuilding.)
+-	if p.Standard && isGoRelease {
+-		return false, "standard package in Go release distribution"
+-	}
+ 
+ 	// Time-based staleness.
+ 
+diff --git a/src/make.bash b/src/make.bash
+index 9553623..525bd2d 100755
+--- a/src/make.bash
++++ b/src/make.bash
+@@ -166,6 +166,9 @@ elif [ "$1" = "--host-only" ]; then
+ 	shift
+ fi
+ 
++# Disable the GOROOT-is-precious patch for compiler/runtime builds
++export GOROOT_OVERRIDE=1
++
+ if [ "$do_host_build" = "yes" ]; then
+ 	./cmd/dist/dist bootstrap $buildall $GO_DISTFLAGS -v # builds go_bootstrap
+ 	# Delay move of dist tool to now, because bootstrap may clear tool directory.
+-- 
+2.7.4
+
