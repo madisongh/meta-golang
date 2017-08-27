@@ -16,6 +16,8 @@ PV="1.0+git${SRCPV}"
 
 GO_SRCROOT = "golang.org/x/crypto"
 
+DEPENDS = "golang-x-sys"
+
 inherit golang
 
 PTEST_ENABLED = ""
