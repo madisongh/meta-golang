@@ -4,9 +4,51 @@ OpenEmbedded/Yocto layer for Go language support
 This layer has been superseded by the addition of
 Go language support in OE-Core.
 
+Go support in OE-Core is mostly compatible with
+meta-golang's support.  The name of the bbclass
+that a Go package recipe must inherit is `go`
+instead of `golang`.
+
+To help with the move to OE-Core's Go support,
+the `golang.bbclass` present in this branch of
+meta-golang provides support for automatically
+making recipes that were written for this layer
+compatible with OE-Core's Go support.  Warnings
+will be generated for recipes that `inherit golang`,
+to let you know that you should convert them.
+
+Converting to OE-Core's Go support
+----------------------------------
+
+1. Change `inherit golang` to `inherit go`.
+
+2. Set the `S` variable, usually to `"${WORKDIR}/git"`.
+   The `go.bbclass` does not set `S` for you.
+
+3. Set the `GO_IMPORT` variable to the import path
+   of the Go package being built.  In most cases, this
+   is the same as what you set `GO_SRCROOT` when using
+   `inherit golang`.
+
+4. Source file/path references are now based off
+   `${B}` instead of `${B}/src`.  If you used
+   `${GO_SRCROOT}` with your meta-golang-based recipes,
+   recplacing that with `src/${GO_IMPORT}` is usually
+   sufficient.
+
+5. If you used multiple repositories in your `SRC_URI`
+   for 'vendoring' in other packages, you will need
+   to change the `destsuffix=` parameter for the
+   vendored packages from `${GO_SRCROOT}` to
+   `git/src/${GO_IMPORT}`.
+
+The recipes in this layer have already been converted;
+compare them to the versions on the `pyro` branch as
+examples for how to convert your own recipes.
+
 This layer depends on:
 URI: git://git.openembedded.org/openembedded-core
-branch: master
+branch: rocko
 
 
 Contributing
