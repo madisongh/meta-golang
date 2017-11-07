@@ -17,6 +17,8 @@ python golang_conversion_handler() {
     replacements = n
     src_uri, n = re.subn(r"git://\${GO_SRCROOT\}", r"git://${GO_IMPORT}", src_uri)
     replacements += n
+    src_uri, n = re.subn(r"git://git@\${GO_SRCROOT\}", r"git://git@${GO_IMPORT}", src_uri)
+    replacements += n
     if replacements > 0:
         e.data.setVar("SRC_URI", src_uri)
     s = e.data.getVar("GO_INSTALL", False)
