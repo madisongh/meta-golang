@@ -1,37 +1,33 @@
 OpenEmbedded/Yocto layer for Go language support
 ================================================
 
-A repository for Go language recipes, including:
-
- * The Go toolchain and runtime from the Go Project (http://golang.org)
-     - adapted to build native, cross, crosssdk, cross-canadian, nativesdk
- * Recipes for packages written in Go
- * A bbclass for simplifying the creation of recipes for Go packages
-     - automatically generates ptest packages using go test framework
-
-All Go package dependencies must be specified in the DEPENDS
-for a recipe.
-
-Go package recipes in this layer have floating (AUTOREV) SRCREVs
-by default on the master branch; these are changed to fixed SRCREVs
-on release branches.
-
-Recipe naming convention:
-
- * All recipes begin with `golang-'
- * Package recipes are named based on the import path, typically
-   omitting the hosting site's domain name but including the
-   rest of the path with hyphens in place of slashes.  Packages
-   using meta-tag references (such as those using gopkg.in) do
-   include the domain name.
-
-This layer depends on:
-URI: git://git.openembedded.org/openembedded-core
-branch: master
+PLEASE NOTE: Starting with OE-Core 'rocko'
+(Yocto Project 2.4), Go support is available
+directly in OE-Core, and meta-golang is no
+longer under active development.
 
 
-Contributing
-------------
+Converting to OE-Core's Go support
+----------------------------------
 
-Please submit issues and pull requests via GitHub.
+1. Change `inherit golang` to `inherit go`.
 
+2. Set the `S` variable, usually to `"${WORKDIR}/git"`.
+   The `go.bbclass` does not set `S` for you.
+
+3. Set the `GO_IMPORT` variable to the import path
+   of the Go package being built.  In most cases, this
+   is the same as what you set `GO_SRCROOT` when using
+   `inherit golang`.
+
+4. Source file/path references are now based off
+   `${B}` instead of `${B}/src`.  If you used
+   `${GO_SRCROOT}` with your meta-golang-based recipes,
+   recplacing that with `src/${GO_IMPORT}` is usually
+   sufficient.
+
+5. If you used multiple repositories in your `SRC_URI`
+   for 'vendoring' in other packages, you will need
+   to change the `destsuffix=` parameter for the
+   vendored packages from `${GO_SRCROOT}` to
+   `git/src/${GO_IMPORT}`.
